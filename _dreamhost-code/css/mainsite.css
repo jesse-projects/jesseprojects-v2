@@ -1,0 +1,163 @@
+@charset 'UTF-8';
+
+html {
+	margin: 0;
+	/* setting border: 0 hoses ie6 win window inner well border */
+	padding: 0;
+	background: url(/images/bg.jpg) no-repeat center top fixed;
+	-webkit-background-size: cover;
+	-moz-background-size: cover;
+	-o-background-size: cover;
+	background-size: cover;
+}
+
+body {
+	margin:0;
+	padding:0;
+	font-family: 'Cabin', serif;
+	font-size: 14px;
+	font-style: normal;
+	font-weight: 400;
+	text-shadow: none;
+	text-decoration: none;
+	text-transform: none;
+	letter-spacing: 0em;
+	word-spacing: 0em;
+	line-height: 1.2;
+
+	color: #DCD2D1;
+}
+
+h1, h2, h3, h4  {
+	font-family: 'OFL Sorts Mill Goudy TT', arial, serif;
+	font-style: normal;
+	font-weight: 900;
+	text-decoration: none;
+	text-transform: none;
+	letter-spacing: 0em;
+	word-spacing: 0em;
+	line-height: 1.2;
+	text-shadow: black 0.1em 0.1em 0.2em;
+}
+
+h1 {
+	font-size: 42px;
+	letter-spacing: 5px;
+}
+
+h2 {
+	font-size: 17px;
+	letter-spacing: 3px;
+}
+
+h3 {
+	clear:both;
+	position:relative;
+	background:#b9a67e;
+	font-size:1.75em;
+	float:left;
+	padding:10px 10px 10px 20px;
+	margin-left:-20px;
+	margin-bottom:20px;
+	
+	-moz-box-shadow:2px 2px 0 rgba(0,0,0,0.1);
+	-webkit-box-shadow:2px 2px 0 rgba(0,0,0,0.1);
+	-o-box-shadow:2px 2px 0 rgba(0,0,0,0.1);
+	box-shadow:2px 2px 0 rgba(0,0,0,0.1);
+}
+
+h3:before{
+	content:" ";
+	background:url(/images/ribbon.png);
+	display:block;
+	width:10px;
+	height:10px;
+	position:absolute;
+	bottom:0;
+	left:0;
+	margin-bottom:-10px;
+	z-index:-1;
+}
+
+p{
+	clear:both;
+	margin-bottom:20px;
+}
+
+a { 
+	color: #9f998d; 
+	text-decoration: none; 
+}
+
+a:hover { 
+	color: #6B6251; 
+	text-decoration: underline;
+}
+
+a:visited {
+	color: #B79352; 
+	text-decoration: none; 
+}
+
+a:active {
+	outline:none;
+}
+
+:focus {
+	-moz-outline-style:none;
+}
+
+img {
+	border: 0px;
+}
+
+table, tr, td {
+	border: 0;
+	padding: 0;
+}
+
+ul 
+  {
+	margin-left: 20px;
+	list-style: disc;
+	list-style-type:disc;
+}
+
+
+#wrap {
+	width: 800px;
+	margin: 0 auto;
+	background: ;
+}
+
+#header {
+	width: 100%;
+	height: 100px;
+
+}
+
+#logo {
+	width: ;
+	margin: ;
+	float: ;
+}
+
+#navigation {
+	width: 380px;
+	height: 95px;
+	vertical-align: bottom;
+	float: right;
+}
+
+#main {
+	clear: both;
+	float: left;
+	width: 580px;
+	padding: 10px;
+}
+
+#footer {
+	clear: both;
+	font-size: 10px;
+	margin: 10px 10px 20px 10px;
+}

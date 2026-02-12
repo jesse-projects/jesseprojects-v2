@@ -1,0 +1,38 @@
+# Project metadata for JesseProjects workshop system
+# This is a sample YAML file showing all supported fields
+
+# Required field - projects without category won't display
+category: "Signage"
+
+# Optional fields - only include if you want them displayed
+title: "Barnswallow Bird"
+#difficulty: "Intermediate"
+#estimated_time: "4-6 hours"
+short_description: "This was an incredibly long process to build this large bird for Barnswallow. I had to cut the design into pieces that could be reassembled. Then I glued it, primed it, and hand-rubbed a gilding paste"
+
+# Specify which image to use as hero/thumbnail
+# If not specified, system looks for hero.jpg, main.jpg, finished.jpg, or uses first image
+hero_image: "20230514_163930_IMG_1368.JPG"
+
+# Materials and tools are stored as keywords for future search/filtering
+materials:
+  - "Wood"
+  - "Gilding Paste"
+
+tools:
+  - "Orbital Sander"
+  - "CNC Machine"
+
+# Optional: If you want step-by-step instructions
+# If this section exists, it will be displayed as a guided tutorial
+# If not, images will be shown in filename order
+# steps:
+  # - title: "Cut all pieces to size"
+    # description: "Measure and cut all boards according to the cut list"
+    # image: "step1-cutting.jpg"
+  # - title: "Sand all surfaces"
+    # description: "Sand with 120 then 220 grit for smooth finish"
+    # image: "step2-sanding.jpg"
+  # - title: "Assemble the frame"
+    # description: "Use wood glue and screws to build the main structure"
+    # image: "step3-assembly.jpg"

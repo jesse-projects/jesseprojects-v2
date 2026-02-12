@@ -1,0 +1,103 @@
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+/* Base styles */
+@layer base {
+  html {
+    scroll-behavior: smooth;
+  }
+
+  body {
+    @apply antialiased;
+    font-feature-settings: "kern" 1, "liga" 1;
+  }
+
+  /* Skip link for accessibility */
+  .skip-link {
+    @apply absolute left-0 top-0 -translate-y-full bg-acqua-teal text-white px-4 py-2 z-50 transition-transform focus:translate-y-0;
+  }
+}
+
+/* Component styles */
+@layer components {
+  /* Carousel container */
+  .carousel-container {
+    @apply relative w-full h-screen overflow-hidden;
+  }
+
+  .carousel-slide {
+    @apply absolute inset-0 opacity-0 transition-opacity duration-700 pointer-events-none;
+  }
+
+  .carousel-slide.active {
+    @apply opacity-100 pointer-events-auto;
+  }
+
+  /* Section styles */
+  .section-content {
+    @apply max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-16;
+  }
+
+  /* Card styles */
+  .card {
+    @apply bg-white dark:bg-acqua-navy-light rounded-lg shadow-lg overflow-hidden transition-transform hover:scale-[1.02];
+  }
+
+  /* Button styles */
+  .btn-primary {
+    @apply inline-flex items-center justify-center px-6 py-3 rounded-lg font-medium transition-all;
+    @apply bg-acqua-teal text-white hover:bg-acqua-teal-dark;
+    @apply focus:outline-none focus:ring-2 focus:ring-acqua-teal focus:ring-offset-2;
+  }
+
+  .btn-secondary {
+    @apply inline-flex items-center justify-center px-6 py-3 rounded-lg font-medium transition-all;
+    @apply bg-acqua-orange text-white hover:bg-acqua-orange-light;
+    @apply focus:outline-none focus:ring-2 focus:ring-acqua-orange focus:ring-offset-2;
+  }
+
+  /* Typography */
+  .heading-1 {
+    @apply text-4xl md:text-5xl lg:text-6xl font-bold tracking-tight;
+  }
+
+  .heading-2 {
+    @apply text-3xl md:text-4xl font-bold tracking-tight;
+  }
+
+  .heading-3 {
+    @apply text-xl md:text-2xl font-semibold;
+  }
+
+  .body-large {
+    @apply text-lg md:text-xl leading-relaxed;
+  }
+}
+
+/* Utility classes */
+@layer utilities {
+  /* Custom scrollbar */
+  .scrollbar-thin::-webkit-scrollbar {
+    width: 8px;
+    height: 8px;
+  }
+
+  .scrollbar-thin::-webkit-scrollbar-track {
+    @apply bg-gray-100 dark:bg-gray-800;
+  }
+
+  .scrollbar-thin::-webkit-scrollbar-thumb {
+    @apply bg-gray-400 dark:bg-gray-600 rounded;
+  }
+
+  /* Text gradient */
+  .text-gradient {
+    @apply bg-clip-text text-transparent bg-gradient-to-r from-acqua-teal to-acqua-orange;
+  }
+
+  /* Glass effect for dark mode */
+  .glass-dark {
+    @apply bg-acqua-navy/80 backdrop-blur-md;
+  }
+}

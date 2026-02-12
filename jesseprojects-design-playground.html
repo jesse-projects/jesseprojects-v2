@@ -1,0 +1,1184 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>JesseProjects.com Design Playground</title>
+  <style>
+    * { box-sizing: border-box; margin: 0; padding: 0; }
+
+    :root {
+      --bg: #0a0a0f;
+      --surface: #141419;
+      --surface-hover: #1c1c24;
+      --border: #2a2a35;
+      --text: #e5e5e5;
+      --text-muted: #888;
+      --accent: #036564;
+    }
+
+    body {
+      font-family: system-ui, -apple-system, sans-serif;
+      background: var(--bg);
+      color: var(--text);
+      min-height: 100vh;
+    }
+
+    .playground {
+      display: grid;
+      grid-template-columns: 320px 1fr;
+      min-height: 100vh;
+    }
+
+    /* Controls Panel */
+    .controls {
+      background: var(--surface);
+      border-right: 1px solid var(--border);
+      padding: 20px;
+      overflow-y: auto;
+      max-height: 100vh;
+    }
+
+    .controls h1 {
+      font-size: 16px;
+      font-weight: 600;
+      margin-bottom: 4px;
+      color: var(--text);
+    }
+
+    .controls .subtitle {
+      font-size: 12px;
+      color: var(--text-muted);
+      margin-bottom: 20px;
+    }
+
+    .section {
+      margin-bottom: 24px;
+    }
+
+    .section-title {
+      font-size: 11px;
+      text-transform: uppercase;
+      letter-spacing: 1px;
+      color: var(--text-muted);
+      margin-bottom: 12px;
+      padding-bottom: 8px;
+      border-bottom: 1px solid var(--border);
+    }
+
+    .control-group {
+      margin-bottom: 16px;
+    }
+
+    .control-group label {
+      display: block;
+      font-size: 12px;
+      color: var(--text-muted);
+      margin-bottom: 6px;
+    }
+
+    .control-group input[type="range"] {
+      width: 100%;
+      accent-color: var(--accent);
+    }
+
+    .control-group select {
+      width: 100%;
+      padding: 8px 12px;
+      background: var(--bg);
+      border: 1px solid var(--border);
+      border-radius: 6px;
+      color: var(--text);
+      font-size: 13px;
+    }
+
+    .control-group input[type="color"] {
+      width: 100%;
+      height: 36px;
+      border: 1px solid var(--border);
+      border-radius: 6px;
+      background: var(--bg);
+      cursor: pointer;
+    }
+
+    .toggle-group {
+      display: flex;
+      align-items: center;
+      gap: 8px;
+    }
+
+    .toggle-group input[type="checkbox"] {
+      width: 18px;
+      height: 18px;
+      accent-color: var(--accent);
+    }
+
+    .value-display {
+      font-size: 11px;
+      color: var(--accent);
+      font-family: monospace;
+      float: right;
+    }
+
+    /* Presets */
+    .presets {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 8px;
+      margin-bottom: 20px;
+    }
+
+    .preset-btn {
+      padding: 6px 12px;
+      background: var(--bg);
+      border: 1px solid var(--border);
+      border-radius: 6px;
+      color: var(--text);
+      font-size: 12px;
+      cursor: pointer;
+      transition: all 0.2s;
+    }
+
+    .preset-btn:hover {
+      background: var(--surface-hover);
+      border-color: var(--accent);
+    }
+
+    .preset-btn.active {
+      background: var(--accent);
+      border-color: var(--accent);
+      color: white;
+    }
+
+    /* Preview Area */
+    .preview-area {
+      display: flex;
+      flex-direction: column;
+      height: 100vh;
+    }
+
+    .preview-header {
+      padding: 12px 20px;
+      background: var(--surface);
+      border-bottom: 1px solid var(--border);
+      display: flex;
+      align-items: center;
+      gap: 16px;
+    }
+
+    .preview-tabs {
+      display: flex;
+      gap: 4px;
+    }
+
+    .preview-tab {
+      padding: 6px 12px;
+      background: transparent;
+      border: none;
+      border-radius: 4px;
+      color: var(--text-muted);
+      font-size: 12px;
+      cursor: pointer;
+    }
+
+    .preview-tab.active {
+      background: var(--accent);
+      color: white;
+    }
+
+    .preview-container {
+      flex: 1;
+      overflow: auto;
+      padding: 20px;
+    }
+
+    /* Site Preview Frame */
+    .site-preview {
+      width: 100%;
+      min-height: 600px;
+      border-radius: 8px;
+      overflow: hidden;
+      box-shadow: 0 4px 24px rgba(0,0,0,0.3);
+    }
+
+    /* Hero Section Preview */
+    .hero-preview {
+      height: 400px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      position: relative;
+      overflow: hidden;
+    }
+
+    .hero-content {
+      text-align: center;
+      z-index: 1;
+      padding: 40px;
+    }
+
+    .hero-content h1 {
+      font-size: 48px;
+      font-weight: 700;
+      margin-bottom: 16px;
+      line-height: 1.1;
+    }
+
+    .hero-content p {
+      font-size: 20px;
+      opacity: 0.8;
+      margin-bottom: 24px;
+      max-width: 600px;
+    }
+
+    .hero-cta {
+      padding: 14px 28px;
+      border: none;
+      border-radius: 8px;
+      font-size: 16px;
+      font-weight: 600;
+      cursor: pointer;
+      transition: transform 0.2s;
+    }
+
+    .hero-cta:hover {
+      transform: translateY(-2px);
+    }
+
+    /* Carousel Indicators */
+    .carousel-indicators {
+      position: absolute;
+      bottom: 24px;
+      left: 50%;
+      transform: translateX(-50%);
+      display: flex;
+      gap: 8px;
+    }
+
+    .carousel-dot {
+      width: 10px;
+      height: 10px;
+      border-radius: 50%;
+      background: rgba(255,255,255,0.4);
+      cursor: pointer;
+    }
+
+    .carousel-dot.active {
+      background: white;
+      transform: scale(1.2);
+    }
+
+    /* Navigation Preview */
+    .nav-preview {
+      padding: 16px 24px;
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+    }
+
+    .nav-logo {
+      font-weight: 700;
+      font-size: 18px;
+    }
+
+    .nav-links {
+      display: flex;
+      gap: 24px;
+    }
+
+    .nav-link {
+      font-size: 14px;
+      opacity: 0.8;
+      cursor: pointer;
+    }
+
+    .nav-link:hover {
+      opacity: 1;
+    }
+
+    .nav-link.active {
+      opacity: 1;
+      font-weight: 600;
+    }
+
+    /* Content Section Preview */
+    .content-preview {
+      padding: 60px 40px;
+    }
+
+    .section-header {
+      text-align: center;
+      margin-bottom: 40px;
+    }
+
+    .section-header h2 {
+      font-size: 36px;
+      font-weight: 700;
+      margin-bottom: 12px;
+    }
+
+    .section-header p {
+      font-size: 18px;
+      opacity: 0.7;
+    }
+
+    /* Service Cards */
+    .services-grid {
+      display: grid;
+      grid-template-columns: repeat(3, 1fr);
+      gap: 24px;
+    }
+
+    .service-card {
+      padding: 32px;
+      border-radius: 12px;
+      transition: transform 0.2s;
+    }
+
+    .service-card:hover {
+      transform: translateY(-4px);
+    }
+
+    .service-card h3 {
+      font-size: 20px;
+      font-weight: 600;
+      margin-bottom: 8px;
+    }
+
+    .service-card .price {
+      font-size: 24px;
+      font-weight: 700;
+      margin-bottom: 12px;
+    }
+
+    .service-card p {
+      font-size: 14px;
+      opacity: 0.7;
+      line-height: 1.5;
+    }
+
+    /* Workshop Grid Preview */
+    .workshop-grid {
+      display: grid;
+      grid-template-columns: repeat(3, 1fr);
+      gap: 20px;
+    }
+
+    .workshop-card {
+      border-radius: 12px;
+      overflow: hidden;
+      cursor: pointer;
+      transition: transform 0.2s;
+    }
+
+    .workshop-card:hover {
+      transform: scale(1.02);
+    }
+
+    .workshop-image {
+      height: 180px;
+      position: relative;
+    }
+
+    .workshop-image::after {
+      content: '';
+      position: absolute;
+      bottom: 0;
+      left: 0;
+      right: 0;
+      height: 60%;
+      background: linear-gradient(transparent, rgba(0,0,0,0.7));
+    }
+
+    .workshop-title {
+      position: absolute;
+      bottom: 12px;
+      left: 12px;
+      z-index: 1;
+      color: white;
+      font-weight: 600;
+    }
+
+    .workshop-meta {
+      padding: 12px;
+      font-size: 13px;
+      opacity: 0.7;
+    }
+
+    /* Prompt Output */
+    .prompt-section {
+      background: var(--surface);
+      border-top: 1px solid var(--border);
+      padding: 16px 20px;
+    }
+
+    .prompt-label {
+      font-size: 11px;
+      text-transform: uppercase;
+      letter-spacing: 1px;
+      color: var(--text-muted);
+      margin-bottom: 8px;
+    }
+
+    .prompt-output {
+      background: var(--bg);
+      border: 1px solid var(--border);
+      border-radius: 8px;
+      padding: 16px;
+      font-size: 13px;
+      line-height: 1.6;
+      color: var(--text);
+      min-height: 80px;
+      max-height: 150px;
+      overflow-y: auto;
+    }
+
+    .copy-btn {
+      margin-top: 12px;
+      padding: 10px 20px;
+      background: var(--accent);
+      border: none;
+      border-radius: 6px;
+      color: white;
+      font-size: 13px;
+      font-weight: 500;
+      cursor: pointer;
+      transition: opacity 0.2s;
+    }
+
+    .copy-btn:hover {
+      opacity: 0.9;
+    }
+
+    .copy-btn.copied {
+      background: #27ae60;
+    }
+
+    /* Color swatches */
+    .color-row {
+      display: flex;
+      gap: 8px;
+      margin-top: 8px;
+    }
+
+    .color-swatch {
+      width: 32px;
+      height: 32px;
+      border-radius: 6px;
+      cursor: pointer;
+      border: 2px solid transparent;
+      transition: border-color 0.2s;
+    }
+
+    .color-swatch:hover, .color-swatch.active {
+      border-color: white;
+    }
+  </style>
+</head>
+<body>
+  <div class="playground">
+    <!-- Controls Panel -->
+    <div class="controls">
+      <h1>JesseProjects.com</h1>
+      <p class="subtitle">Design Explorer</p>
+
+      <!-- Presets -->
+      <div class="section">
+        <div class="section-title">Presets</div>
+        <div class="presets">
+          <button class="preset-btn active" onclick="applyPreset('professional')">Professional</button>
+          <button class="preset-btn" onclick="applyPreset('bold')">Bold</button>
+          <button class="preset-btn" onclick="applyPreset('minimal')">Minimal</button>
+          <button class="preset-btn" onclick="applyPreset('construction')">Construction</button>
+        </div>
+      </div>
+
+      <!-- Theme -->
+      <div class="section">
+        <div class="section-title">Theme</div>
+        <div class="control-group">
+          <div class="toggle-group">
+            <input type="checkbox" id="darkMode" checked onchange="updateAll()">
+            <label for="darkMode">Dark Mode</label>
+          </div>
+        </div>
+      </div>
+
+      <!-- Colors -->
+      <div class="section">
+        <div class="section-title">Color Palette</div>
+
+        <div class="control-group">
+          <label>Primary Color</label>
+          <div class="color-row">
+            <div class="color-swatch active" style="background: #036564" onclick="setColor('primary', '#036564', this)" title="Acqua Teal"></div>
+            <div class="color-swatch" style="background: #1a73e8" onclick="setColor('primary', '#1a73e8', this)" title="Blue"></div>
+            <div class="color-swatch" style="background: #e74c3c" onclick="setColor('primary', '#e74c3c', this)" title="Red"></div>
+            <div class="color-swatch" style="background: #8b5cf6" onclick="setColor('primary', '#8b5cf6', this)" title="Purple"></div>
+            <div class="color-swatch" style="background: #059669" onclick="setColor('primary', '#059669', this)" title="Green"></div>
+          </div>
+        </div>
+
+        <div class="control-group">
+          <label>Accent Color</label>
+          <div class="color-row">
+            <div class="color-swatch active" style="background: #F7941F" onclick="setColor('accent', '#F7941F', this)" title="Orange"></div>
+            <div class="color-swatch" style="background: #f59e0b" onclick="setColor('accent', '#f59e0b', this)" title="Amber"></div>
+            <div class="color-swatch" style="background: #ec4899" onclick="setColor('accent', '#ec4899', this)" title="Pink"></div>
+            <div class="color-swatch" style="background: #14b8a6" onclick="setColor('accent', '#14b8a6', this)" title="Teal"></div>
+            <div class="color-swatch" style="background: #f97316" onclick="setColor('accent', '#f97316', this)" title="Deep Orange"></div>
+          </div>
+        </div>
+      </div>
+
+      <!-- Hero Layout -->
+      <div class="section">
+        <div class="section-title">Hero Section</div>
+
+        <div class="control-group">
+          <label>Hero Style <span class="value-display" id="heroStyleValue">gradient</span></label>
+          <select id="heroStyle" onchange="updateAll()">
+            <option value="gradient">Gradient Background</option>
+            <option value="image">Background Image</option>
+            <option value="split">Split (Text + Image)</option>
+            <option value="minimal">Minimal (Text Only)</option>
+          </select>
+        </div>
+
+        <div class="control-group">
+          <label>Hero Height <span class="value-display" id="heroHeightValue">100vh</span></label>
+          <input type="range" id="heroHeight" min="50" max="100" value="100" oninput="updateAll()">
+        </div>
+
+        <div class="control-group">
+          <label>Text Alignment <span class="value-display" id="textAlignValue">center</span></label>
+          <select id="textAlign" onchange="updateAll()">
+            <option value="center">Center</option>
+            <option value="left">Left</option>
+            <option value="right">Right</option>
+          </select>
+        </div>
+      </div>
+
+      <!-- Typography -->
+      <div class="section">
+        <div class="section-title">Typography</div>
+
+        <div class="control-group">
+          <label>Heading Font <span class="value-display" id="headingFontValue">System</span></label>
+          <select id="headingFont" onchange="updateAll()">
+            <option value="system">System UI</option>
+            <option value="serif">Georgia (Serif)</option>
+            <option value="mono">Monospace</option>
+            <option value="condensed">Roboto Condensed</option>
+          </select>
+        </div>
+
+        <div class="control-group">
+          <label>Heading Size <span class="value-display" id="headingSizeValue">48px</span></label>
+          <input type="range" id="headingSize" min="32" max="72" value="48" oninput="updateAll()">
+        </div>
+
+        <div class="control-group">
+          <label>Body Size <span class="value-display" id="bodySizeValue">16px</span></label>
+          <input type="range" id="bodySize" min="14" max="20" value="16" oninput="updateAll()">
+        </div>
+      </div>
+
+      <!-- Cards & Components -->
+      <div class="section">
+        <div class="section-title">Cards & Components</div>
+
+        <div class="control-group">
+          <label>Card Style <span class="value-display" id="cardStyleValue">elevated</span></label>
+          <select id="cardStyle" onchange="updateAll()">
+            <option value="elevated">Elevated (Shadow)</option>
+            <option value="bordered">Bordered</option>
+            <option value="filled">Filled Background</option>
+            <option value="glass">Glassmorphism</option>
+          </select>
+        </div>
+
+        <div class="control-group">
+          <label>Border Radius <span class="value-display" id="radiusValue">12px</span></label>
+          <input type="range" id="borderRadius" min="0" max="24" value="12" oninput="updateAll()">
+        </div>
+
+        <div class="control-group">
+          <label>Card Spacing <span class="value-display" id="spacingValue">24px</span></label>
+          <input type="range" id="cardSpacing" min="12" max="40" value="24" oninput="updateAll()">
+        </div>
+      </div>
+
+      <!-- Navigation -->
+      <div class="section">
+        <div class="section-title">Navigation</div>
+
+        <div class="control-group">
+          <label>Nav Position <span class="value-display" id="navPositionValue">overlay</span></label>
+          <select id="navPosition" onchange="updateAll()">
+            <option value="overlay">Overlay on Hero</option>
+            <option value="fixed">Fixed Top</option>
+            <option value="sticky">Sticky on Scroll</option>
+          </select>
+        </div>
+
+        <div class="control-group">
+          <div class="toggle-group">
+            <input type="checkbox" id="showCarouselDots" checked onchange="updateAll()">
+            <label for="showCarouselDots">Show Carousel Dots</label>
+          </div>
+        </div>
+      </div>
+
+      <!-- Animations -->
+      <div class="section">
+        <div class="section-title">Animations</div>
+
+        <div class="control-group">
+          <div class="toggle-group">
+            <input type="checkbox" id="enableAnimations" checked onchange="updateAll()">
+            <label for="enableAnimations">Enable Animations</label>
+          </div>
+        </div>
+
+        <div class="control-group">
+          <label>Animation Style <span class="value-display" id="animStyleValue">fade-up</span></label>
+          <select id="animationStyle" onchange="updateAll()">
+            <option value="fade-up">Fade Up</option>
+            <option value="fade">Fade Only</option>
+            <option value="slide">Slide In</option>
+            <option value="scale">Scale In</option>
+          </select>
+        </div>
+      </div>
+
+      <!-- Workshop Section -->
+      <div class="section">
+        <div class="section-title">Workshop Gallery</div>
+
+        <div class="control-group">
+          <label>Grid Columns <span class="value-display" id="gridColsValue">3</span></label>
+          <input type="range" id="gridColumns" min="2" max="4" value="3" oninput="updateAll()">
+        </div>
+
+        <div class="control-group">
+          <div class="toggle-group">
+            <input type="checkbox" id="showFilters" checked onchange="updateAll()">
+            <label for="showFilters">Show Category Filters</label>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- Preview Area -->
+    <div class="preview-area">
+      <div class="preview-header">
+        <div class="preview-tabs">
+          <button class="preview-tab active" onclick="showSection('consulting', this)">Consulting</button>
+          <button class="preview-tab" onclick="showSection('workshop', this)">Workshop</button>
+          <button class="preview-tab" onclick="showSection('about', this)">About</button>
+        </div>
+      </div>
+
+      <div class="preview-container">
+        <div class="site-preview" id="sitePreview">
+          <!-- Dynamic content rendered here -->
+        </div>
+      </div>
+
+      <!-- Prompt Output -->
+      <div class="prompt-section">
+        <div class="prompt-label">Design Prompt (copy to Claude)</div>
+        <div class="prompt-output" id="promptOutput">
+          Adjust controls to generate a design prompt...
+        </div>
+        <button class="copy-btn" onclick="copyPrompt()">Copy Prompt</button>
+      </div>
+    </div>
+  </div>
+
+  <script>
+    // Default state
+    const DEFAULTS = {
+      darkMode: true,
+      primary: '#036564',
+      accent: '#F7941F',
+      heroStyle: 'gradient',
+      heroHeight: 100,
+      textAlign: 'center',
+      headingFont: 'system',
+      headingSize: 48,
+      bodySize: 16,
+      cardStyle: 'elevated',
+      borderRadius: 12,
+      cardSpacing: 24,
+      navPosition: 'overlay',
+      showCarouselDots: true,
+      enableAnimations: true,
+      animationStyle: 'fade-up',
+      gridColumns: 3,
+      showFilters: true,
+      currentSection: 'consulting'
+    };
+
+    // Current state
+    const state = { ...DEFAULTS };
+
+    // Presets
+    const presets = {
+      professional: {
+        darkMode: true,
+        primary: '#036564',
+        accent: '#F7941F',
+        heroStyle: 'gradient',
+        heroHeight: 100,
+        textAlign: 'center',
+        headingFont: 'system',
+        headingSize: 48,
+        cardStyle: 'elevated',
+        borderRadius: 12,
+        cardSpacing: 24,
+        animationStyle: 'fade-up'
+      },
+      bold: {
+        darkMode: true,
+        primary: '#e74c3c',
+        accent: '#f59e0b',
+        heroStyle: 'gradient',
+        heroHeight: 100,
+        textAlign: 'center',
+        headingFont: 'condensed',
+        headingSize: 64,
+        cardStyle: 'filled',
+        borderRadius: 16,
+        cardSpacing: 32,
+        animationStyle: 'scale'
+      },
+      minimal: {
+        darkMode: false,
+        primary: '#1a73e8',
+        accent: '#14b8a6',
+        heroStyle: 'minimal',
+        heroHeight: 80,
+        textAlign: 'left',
+        headingFont: 'system',
+        headingSize: 40,
+        cardStyle: 'bordered',
+        borderRadius: 8,
+        cardSpacing: 20,
+        animationStyle: 'fade'
+      },
+      construction: {
+        darkMode: true,
+        primary: '#f59e0b',
+        accent: '#ef4444',
+        heroStyle: 'split',
+        heroHeight: 90,
+        textAlign: 'left',
+        headingFont: 'condensed',
+        headingSize: 56,
+        cardStyle: 'elevated',
+        borderRadius: 8,
+        cardSpacing: 24,
+        animationStyle: 'slide'
+      }
+    };
+
+    function applyPreset(name) {
+      const preset = presets[name];
+      Object.assign(state, preset);
+
+      // Update controls to match
+      document.getElementById('darkMode').checked = state.darkMode;
+      document.getElementById('heroStyle').value = state.heroStyle;
+      document.getElementById('heroHeight').value = state.heroHeight;
+      document.getElementById('textAlign').value = state.textAlign;
+      document.getElementById('headingFont').value = state.headingFont;
+      document.getElementById('headingSize').value = state.headingSize;
+      document.getElementById('cardStyle').value = state.cardStyle;
+      document.getElementById('borderRadius').value = state.borderRadius;
+      document.getElementById('cardSpacing').value = state.cardSpacing;
+      document.getElementById('animationStyle').value = state.animationStyle;
+
+      // Update color swatches
+      document.querySelectorAll('.color-swatch').forEach(el => el.classList.remove('active'));
+      document.querySelector(`.color-swatch[style*="${state.primary}"]`)?.classList.add('active');
+      document.querySelector(`.color-swatch[style*="${state.accent}"]`)?.classList.add('active');
+
+      // Update preset buttons
+      document.querySelectorAll('.preset-btn').forEach(btn => btn.classList.remove('active'));
+      event.target.classList.add('active');
+
+      updateAll();
+    }
+
+    function setColor(type, color, el) {
+      state[type] = color;
+      el.parentElement.querySelectorAll('.color-swatch').forEach(s => s.classList.remove('active'));
+      el.classList.add('active');
+      updateAll();
+    }
+
+    function showSection(section, btn) {
+      state.currentSection = section;
+      document.querySelectorAll('.preview-tab').forEach(t => t.classList.remove('active'));
+      btn.classList.add('active');
+      renderPreview();
+    }
+
+    function updateAll() {
+      // Read all control values
+      state.darkMode = document.getElementById('darkMode').checked;
+      state.heroStyle = document.getElementById('heroStyle').value;
+      state.heroHeight = parseInt(document.getElementById('heroHeight').value);
+      state.textAlign = document.getElementById('textAlign').value;
+      state.headingFont = document.getElementById('headingFont').value;
+      state.headingSize = parseInt(document.getElementById('headingSize').value);
+      state.bodySize = parseInt(document.getElementById('bodySize').value);
+      state.cardStyle = document.getElementById('cardStyle').value;
+      state.borderRadius = parseInt(document.getElementById('borderRadius').value);
+      state.cardSpacing = parseInt(document.getElementById('cardSpacing').value);
+      state.navPosition = document.getElementById('navPosition').value;
+      state.showCarouselDots = document.getElementById('showCarouselDots').checked;
+      state.enableAnimations = document.getElementById('enableAnimations').checked;
+      state.animationStyle = document.getElementById('animationStyle').value;
+      state.gridColumns = parseInt(document.getElementById('gridColumns').value);
+      state.showFilters = document.getElementById('showFilters').checked;
+
+      // Update value displays
+      document.getElementById('heroStyleValue').textContent = state.heroStyle;
+      document.getElementById('heroHeightValue').textContent = state.heroHeight + 'vh';
+      document.getElementById('textAlignValue').textContent = state.textAlign;
+      document.getElementById('headingFontValue').textContent = state.headingFont;
+      document.getElementById('headingSizeValue').textContent = state.headingSize + 'px';
+      document.getElementById('bodySizeValue').textContent = state.bodySize + 'px';
+      document.getElementById('cardStyleValue').textContent = state.cardStyle;
+      document.getElementById('radiusValue').textContent = state.borderRadius + 'px';
+      document.getElementById('spacingValue').textContent = state.cardSpacing + 'px';
+      document.getElementById('navPositionValue').textContent = state.navPosition;
+      document.getElementById('animStyleValue').textContent = state.animationStyle;
+      document.getElementById('gridColsValue').textContent = state.gridColumns;
+
+      renderPreview();
+      updatePrompt();
+    }
+
+    function getCardStyles() {
+      const styles = {
+        elevated: `background: ${state.darkMode ? '#1a1a2e' : '#ffffff'}; box-shadow: 0 4px 20px rgba(0,0,0,${state.darkMode ? 0.4 : 0.1});`,
+        bordered: `background: transparent; border: 1px solid ${state.darkMode ? '#333' : '#ddd'};`,
+        filled: `background: ${state.darkMode ? '#1a1a2e' : '#f5f5f5'};`,
+        glass: `background: ${state.darkMode ? 'rgba(255,255,255,0.05)' : 'rgba(0,0,0,0.03)'}; backdrop-filter: blur(10px); border: 1px solid ${state.darkMode ? 'rgba(255,255,255,0.1)' : 'rgba(0,0,0,0.05)'};`
+      };
+      return styles[state.cardStyle];
+    }
+
+    function getFontFamily() {
+      const fonts = {
+        system: 'system-ui, -apple-system, sans-serif',
+        serif: 'Georgia, "Times New Roman", serif',
+        mono: 'ui-monospace, "SF Mono", monospace',
+        condensed: '"Roboto Condensed", system-ui, sans-serif'
+      };
+      return fonts[state.headingFont];
+    }
+
+    function getHeroBackground() {
+      if (state.heroStyle === 'minimal') {
+        return state.darkMode ? '#0a0a14' : '#ffffff';
+      }
+      if (state.heroStyle === 'image') {
+        return `linear-gradient(rgba(0,0,0,0.6), rgba(0,0,0,0.6)), url('https://images.unsplash.com/photo-1504307651254-35680f356dfd?w=1200') center/cover`;
+      }
+      // Gradient using primary color
+      return `linear-gradient(135deg, ${state.primary} 0%, #031634 100%)`;
+    }
+
+    function renderPreview() {
+      const preview = document.getElementById('sitePreview');
+      const bg = state.darkMode ? '#0a0a14' : '#f5f5f0';
+      const text = state.darkMode ? '#e5e5e5' : '#1a1a2e';
+      const textMuted = state.darkMode ? 'rgba(255,255,255,0.7)' : 'rgba(0,0,0,0.7)';
+
+      let content = '';
+
+      if (state.currentSection === 'consulting') {
+        content = `
+          <!-- Nav -->
+          <div class="nav-preview" style="background: ${state.navPosition === 'overlay' ? 'transparent' : (state.darkMode ? '#0a0a14' : '#ffffff')}; color: white; position: ${state.navPosition === 'overlay' ? 'absolute' : 'relative'}; top: 0; left: 0; right: 0; z-index: 10;">
+            <div class="nav-logo" style="color: ${state.navPosition === 'overlay' ? 'white' : state.primary}">JesseProjects</div>
+            <div class="nav-links" style="color: ${state.navPosition === 'overlay' ? 'white' : text}">
+              <span class="nav-link active">Consulting</span>
+              <span class="nav-link">Photography</span>
+              <span class="nav-link">Workshop</span>
+              <span class="nav-link">About</span>
+            </div>
+          </div>
+
+          <!-- Hero -->
+          <div class="hero-preview" style="background: ${getHeroBackground()}; height: ${state.heroHeight * 4}px; min-height: 400px;">
+            <div class="hero-content" style="text-align: ${state.textAlign}; ${state.heroStyle === 'split' ? 'max-width: 50%; margin-left: 40px; margin-right: auto;' : ''}">
+              <h1 style="font-family: ${getFontFamily()}; font-size: ${state.headingSize}px; color: white;">
+                Construction companies lose thousands to bad ERP data.
+                <span style="color: ${state.accent}">I fix that.</span>
+              </h1>
+              <p style="font-size: ${state.bodySize + 4}px; color: rgba(255,255,255,0.8);">
+                Custom reports, integrations, and dashboards that give you exact numbers—not "close enough."
+              </p>
+              <button class="hero-cta" style="background: ${state.accent}; color: white; border-radius: ${state.borderRadius}px;">
+                Let's Talk About Your Data
+              </button>
+            </div>
+            ${state.showCarouselDots ? `
+              <div class="carousel-indicators">
+                <div class="carousel-dot active"></div>
+                <div class="carousel-dot"></div>
+                <div class="carousel-dot"></div>
+                <div class="carousel-dot"></div>
+              </div>
+            ` : ''}
+          </div>
+
+          <!-- Services -->
+          <div class="content-preview" style="background: ${bg}; color: ${text};">
+            <div class="section-header">
+              <h2 style="font-family: ${getFontFamily()}; font-size: ${state.headingSize * 0.75}px;">Services</h2>
+              <p style="font-size: ${state.bodySize}px; color: ${textMuted};">Solutions for construction technology challenges</p>
+            </div>
+            <div class="services-grid" style="gap: ${state.cardSpacing}px;">
+              <div class="service-card" style="${getCardStyles()} border-radius: ${state.borderRadius}px;">
+                <h3 style="color: ${state.primary}">Custom Reports</h3>
+                <div class="price" style="color: ${text}">$2,000 - $5,000</div>
+                <p style="color: ${textMuted}">One-time SQL report connecting your ERP data to the exact numbers you need.</p>
+              </div>
+              <div class="service-card" style="${getCardStyles()} border-radius: ${state.borderRadius}px;">
+                <h3 style="color: ${state.primary}">Dashboard Packages</h3>
+                <div class="price" style="color: ${text}">$8,000 - $15,000</div>
+                <p style="color: ${textMuted}">Interactive dashboards for executives and PMs with real-time visibility.</p>
+              </div>
+              <div class="service-card" style="${getCardStyles()} border-radius: ${state.borderRadius}px;">
+                <h3 style="color: ${state.primary}">Data Integrations</h3>
+                <div class="price" style="color: ${text}">$10,000 - $25,000</div>
+                <p style="color: ${textMuted}">Connect your ERP to other systems—bidding, HR, equipment, field apps.</p>
+              </div>
+            </div>
+          </div>
+        `;
+      } else if (state.currentSection === 'workshop') {
+        content = `
+          <!-- Nav -->
+          <div class="nav-preview" style="background: ${state.darkMode ? '#0a0a14' : '#ffffff'}; color: ${text};">
+            <div class="nav-logo" style="color: ${state.primary}">JesseProjects</div>
+            <div class="nav-links">
+              <span class="nav-link">Consulting</span>
+              <span class="nav-link">Photography</span>
+              <span class="nav-link active">Workshop</span>
+              <span class="nav-link">About</span>
+            </div>
+          </div>
+
+          <div class="content-preview" style="background: ${bg}; color: ${text};">
+            <div class="section-header">
+              <h2 style="font-family: ${getFontFamily()}; font-size: ${state.headingSize * 0.75}px;">Workshop Projects</h2>
+              <p style="font-size: ${state.bodySize}px; color: ${textMuted};">Creative projects from woodworking to metalwork</p>
+            </div>
+
+            ${state.showFilters ? `
+              <div style="display: flex; gap: 8px; justify-content: center; margin-bottom: 32px;">
+                <button style="padding: 8px 16px; border-radius: 20px; background: ${state.primary}; color: white; border: none; font-size: 13px;">All Projects</button>
+                <button style="padding: 8px 16px; border-radius: 20px; background: ${state.darkMode ? '#1a1a2e' : '#eee'}; color: ${text}; border: none; font-size: 13px;">Signage</button>
+                <button style="padding: 8px 16px; border-radius: 20px; background: ${state.darkMode ? '#1a1a2e' : '#eee'}; color: ${text}; border: none; font-size: 13px;">Metal Work</button>
+                <button style="padding: 8px 16px; border-radius: 20px; background: ${state.darkMode ? '#1a1a2e' : '#eee'}; color: ${text}; border: none; font-size: 13px;">Woodworking</button>
+              </div>
+            ` : ''}
+
+            <div class="workshop-grid" style="grid-template-columns: repeat(${state.gridColumns}, 1fr); gap: ${state.cardSpacing}px;">
+              ${[
+                { title: 'CNC Bird Sign', cat: 'Signage', color: state.primary },
+                { title: 'Steel Wall Art', cat: 'Metal Work', color: '#4a5568' },
+                { title: 'Custom Shelving', cat: 'Woodworking', color: '#8b5a2b' },
+                { title: 'LED Sign', cat: 'Signage', color: state.primary },
+                { title: 'Garden Planter', cat: 'Woodworking', color: '#8b5a2b' },
+                { title: 'Metal Gate', cat: 'Metal Work', color: '#4a5568' }
+              ].slice(0, state.gridColumns * 2).map(p => `
+                <div class="workshop-card" style="${getCardStyles()} border-radius: ${state.borderRadius}px; overflow: hidden;">
+                  <div class="workshop-image" style="background: linear-gradient(135deg, ${p.color}, #1a1a2e);">
+                    <div class="workshop-title">${p.title}</div>
+                  </div>
+                  <div class="workshop-meta" style="color: ${textMuted}; background: ${state.darkMode ? '#1a1a2e' : '#fff'};">${p.cat}</div>
+                </div>
+              `).join('')}
+            </div>
+          </div>
+        `;
+      } else if (state.currentSection === 'about') {
+        content = `
+          <!-- Nav -->
+          <div class="nav-preview" style="background: ${state.darkMode ? '#0a0a14' : '#ffffff'}; color: ${text};">
+            <div class="nav-logo" style="color: ${state.primary}">JesseProjects</div>
+            <div class="nav-links">
+              <span class="nav-link">Consulting</span>
+              <span class="nav-link">Photography</span>
+              <span class="nav-link">Workshop</span>
+              <span class="nav-link active">About</span>
+            </div>
+          </div>
+
+          <div class="content-preview" style="background: ${bg}; color: ${text};">
+            <div style="display: grid; grid-template-columns: 1fr 2fr; gap: 40px; max-width: 900px; margin: 0 auto;">
+              <div style="aspect-ratio: 1; background: linear-gradient(135deg, ${state.primary}, #031634); border-radius: ${state.borderRadius}px;"></div>
+              <div>
+                <h2 style="font-family: ${getFontFamily()}; font-size: ${state.headingSize * 0.75}px; margin-bottom: 16px;">Jesse Jones</h2>
+                <p style="font-size: ${state.bodySize + 2}px; color: ${textMuted}; margin-bottom: 16px; line-height: 1.6;">
+                  24 years in construction technology. I help construction teams make safer technology decisions by translating between how work happens and how tools work.
+                </p>
+                <p style="font-size: ${state.bodySize}px; color: ${textMuted}; line-height: 1.6;">
+                  I'm not a vendor—I'm a working operator who's been on both sides of the fence. My role is simple: I'm the person who makes tools actually work together.
+                </p>
+              </div>
+            </div>
+
+            <div style="margin-top: 60px; padding: 40px; background: ${state.primary}; border-radius: ${state.borderRadius}px;">
+              <h3 style="color: white; text-align: center; font-family: ${getFontFamily()}; font-size: 24px; margin-bottom: 24px;">Philosophy</h3>
+              <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 20px;">
+                <div style="padding: 20px; background: rgba(255,255,255,0.1); border-radius: 8px; border-left: 3px solid ${state.accent};">
+                  <p style="color: white; font-style: italic;">"Solution statements end discussion. Problem statements start it."</p>
+                </div>
+                <div style="padding: 20px; background: rgba(255,255,255,0.1); border-radius: 8px; border-left: 3px solid ${state.accent};">
+                  <p style="color: white; font-style: italic;">"If the field won't use it, it's broken."</p>
+                </div>
+              </div>
+            </div>
+          </div>
+        `;
+      }
+
+      preview.innerHTML = content;
+      preview.style.background = bg;
+    }
+
+    function updatePrompt() {
+      const parts = [];
+
+      // Theme
+      if (state.darkMode !== DEFAULTS.darkMode) {
+        parts.push(state.darkMode ? 'dark mode as default' : 'light mode as default');
+      } else if (state.darkMode) {
+        parts.push('dark mode with system detection');
+      }
+
+      // Colors (always mention since they're key)
+      parts.push(`primary color ${state.primary} (teal)`);
+      parts.push(`accent color ${state.accent} (orange)`);
+
+      // Hero
+      if (state.heroStyle !== DEFAULTS.heroStyle) {
+        const heroDesc = {
+          'gradient': 'gradient background hero',
+          'image': 'full-bleed image hero with overlay',
+          'split': 'split layout hero (text left, visual right)',
+          'minimal': 'minimal text-only hero'
+        };
+        parts.push(heroDesc[state.heroStyle]);
+      }
+
+      if (state.heroHeight !== DEFAULTS.heroHeight) {
+        parts.push(`hero at ${state.heroHeight}vh height`);
+      }
+
+      if (state.textAlign !== DEFAULTS.textAlign) {
+        parts.push(`${state.textAlign}-aligned hero text`);
+      }
+
+      // Typography
+      if (state.headingFont !== DEFAULTS.headingFont) {
+        const fontDesc = {
+          'system': 'system fonts',
+          'serif': 'serif headings (Georgia)',
+          'mono': 'monospace headings',
+          'condensed': 'condensed headings'
+        };
+        parts.push(fontDesc[state.headingFont]);
+      }
+
+      if (state.headingSize !== DEFAULTS.headingSize) {
+        parts.push(`${state.headingSize}px heading size`);
+      }
+
+      // Cards
+      if (state.cardStyle !== DEFAULTS.cardStyle) {
+        const cardDesc = {
+          'elevated': 'elevated cards with shadow',
+          'bordered': 'bordered cards',
+          'filled': 'filled background cards',
+          'glass': 'glassmorphism cards'
+        };
+        parts.push(cardDesc[state.cardStyle]);
+      }
+
+      if (state.borderRadius !== DEFAULTS.borderRadius) {
+        parts.push(`${state.borderRadius}px border radius`);
+      }
+
+      // Animations
+      if (state.enableAnimations && state.animationStyle !== DEFAULTS.animationStyle) {
+        const animDesc = {
+          'fade-up': 'fade-up scroll animations',
+          'fade': 'subtle fade animations',
+          'slide': 'slide-in animations',
+          'scale': 'scale-in animations'
+        };
+        parts.push(animDesc[state.animationStyle]);
+      }
+
+      if (!state.enableAnimations) {
+        parts.push('minimal/no animations');
+      }
+
+      // Workshop
+      if (state.gridColumns !== DEFAULTS.gridColumns) {
+        parts.push(`${state.gridColumns}-column workshop grid`);
+      }
+
+      if (!state.showFilters) {
+        parts.push('workshop without category filters');
+      }
+
+      // Build prompt
+      const prompt = `Build JesseProjects.com with a 4-section horizontal carousel (Consulting, Photography, Workshop, About).
+
+Design specifications:
+- ${parts.join('\n- ')}
+
+Key features:
+- Hero carousel cycles through sections with ${state.showCarouselDots ? 'dot indicators' : 'no indicators'}
+- Consulting section: hero statement, problem/solution framing, services grid with pricing, CTA to Calendly
+- Photography section: category cards for Wedding, Portrait, Events, Commercial
+- Workshop section: dynamic gallery fetching from YAML metadata API, filter by category, modal with image lightbox
+- About section: bio, ERP expertise (Foundation, Vista, Spectrum, CMiC), philosophy quotes, contact form
+
+Tech stack: React + Vite, Tailwind CSS, Framer Motion for animations.
+Workshop data from existing PHP API at jesseprojects.com/api/workshops.php.`;
+
+      document.getElementById('promptOutput').textContent = prompt;
+    }
+
+    function copyPrompt() {
+      const text = document.getElementById('promptOutput').textContent;
+      navigator.clipboard.writeText(text).then(() => {
+        const btn = document.querySelector('.copy-btn');
+        btn.textContent = 'Copied!';
+        btn.classList.add('copied');
+        setTimeout(() => {
+          btn.textContent = 'Copy Prompt';
+          btn.classList.remove('copied');
+        }, 2000);
+      });
+    }
+
+    // Initialize
+    updateAll();
+  </script>
+</body>
+</html>

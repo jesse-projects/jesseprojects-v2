@@ -1,0 +1,988 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>JesseProjects.com Design Playground</title>
+  <style>
+    * { box-sizing: border-box; margin: 0; padding: 0; }
+
+    :root {
+      --ui-bg: #1a1a2e;
+      --ui-surface: #16213e;
+      --ui-border: #0f3460;
+      --ui-text: #e8e8e8;
+      --ui-muted: #a0a0a0;
+      --ui-accent: #e74c3c;
+      --ui-success: #27ae60;
+    }
+
+    body {
+      font-family: system-ui, -apple-system, 'Segoe UI', Roboto, sans-serif;
+      background: var(--ui-bg);
+      color: var(--ui-text);
+      min-height: 100vh;
+      display: flex;
+    }
+
+    /* Layout */
+    .controls {
+      width: 320px;
+      min-width: 320px;
+      background: var(--ui-surface);
+      border-right: 1px solid var(--ui-border);
+      padding: 20px;
+      overflow-y: auto;
+      max-height: 100vh;
+    }
+
+    .preview-container {
+      flex: 1;
+      display: flex;
+      flex-direction: column;
+      overflow: hidden;
+    }
+
+    .preview {
+      flex: 1;
+      overflow: auto;
+      background: #fff;
+    }
+
+    .prompt-output {
+      background: var(--ui-surface);
+      border-top: 1px solid var(--ui-border);
+      padding: 16px 20px;
+      min-height: 120px;
+    }
+
+    /* Control Groups */
+    .control-group {
+      margin-bottom: 24px;
+    }
+
+    .control-group h3 {
+      font-size: 11px;
+      text-transform: uppercase;
+      letter-spacing: 1px;
+      color: var(--ui-muted);
+      margin-bottom: 12px;
+      padding-bottom: 8px;
+      border-bottom: 1px solid var(--ui-border);
+    }
+
+    .control {
+      margin-bottom: 12px;
+    }
+
+    .control label {
+      display: block;
+      font-size: 13px;
+      margin-bottom: 6px;
+      color: var(--ui-text);
+    }
+
+    .control input[type="range"] {
+      width: 100%;
+      accent-color: var(--ui-accent);
+    }
+
+    .control input[type="color"] {
+      width: 100%;
+      height: 36px;
+      border: 1px solid var(--ui-border);
+      border-radius: 4px;
+      cursor: pointer;
+    }
+
+    .control select {
+      width: 100%;
+      padding: 8px 12px;
+      background: var(--ui-bg);
+      border: 1px solid var(--ui-border);
+      border-radius: 4px;
+      color: var(--ui-text);
+      font-size: 13px;
+    }
+
+    .control textarea {
+      width: 100%;
+      padding: 8px 12px;
+      background: var(--ui-bg);
+      border: 1px solid var(--ui-border);
+      border-radius: 4px;
+      color: var(--ui-text);
+      font-size: 13px;
+      resize: vertical;
+      min-height: 60px;
+    }
+
+    .value-display {
+      font-size: 11px;
+      color: var(--ui-muted);
+      font-family: monospace;
+      margin-top: 4px;
+    }
+
+    /* Presets */
+    .presets {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 8px;
+      margin-bottom: 20px;
+    }
+
+    .preset-btn {
+      padding: 6px 12px;
+      background: var(--ui-bg);
+      border: 1px solid var(--ui-border);
+      border-radius: 4px;
+      color: var(--ui-text);
+      font-size: 12px;
+      cursor: pointer;
+      transition: all 0.2s;
+    }
+
+    .preset-btn:hover {
+      background: var(--ui-accent);
+      border-color: var(--ui-accent);
+    }
+
+    .preset-btn.active {
+      background: var(--ui-accent);
+      border-color: var(--ui-accent);
+    }
+
+    /* Prompt Output */
+    .prompt-header {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      margin-bottom: 10px;
+    }
+
+    .prompt-header h4 {
+      font-size: 12px;
+      text-transform: uppercase;
+      letter-spacing: 1px;
+      color: var(--ui-muted);
+    }
+
+    .copy-btn {
+      padding: 6px 14px;
+      background: var(--ui-accent);
+      border: none;
+      border-radius: 4px;
+      color: white;
+      font-size: 12px;
+      cursor: pointer;
+      transition: all 0.2s;
+    }
+
+    .copy-btn:hover {
+      opacity: 0.9;
+    }
+
+    .copy-btn.copied {
+      background: var(--ui-success);
+    }
+
+    #prompt-text {
+      font-family: system-ui, sans-serif;
+      font-size: 13px;
+      line-height: 1.5;
+      color: var(--ui-text);
+    }
+
+    /* Toggle Switch */
+    .toggle-row {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      margin-bottom: 12px;
+    }
+
+    .toggle {
+      position: relative;
+      width: 44px;
+      height: 24px;
+    }
+
+    .toggle input {
+      opacity: 0;
+      width: 0;
+      height: 0;
+    }
+
+    .toggle-slider {
+      position: absolute;
+      cursor: pointer;
+      top: 0;
+      left: 0;
+      right: 0;
+      bottom: 0;
+      background: var(--ui-bg);
+      border: 1px solid var(--ui-border);
+      border-radius: 12px;
+      transition: 0.3s;
+    }
+
+    .toggle-slider:before {
+      position: absolute;
+      content: "";
+      height: 18px;
+      width: 18px;
+      left: 2px;
+      bottom: 2px;
+      background: var(--ui-muted);
+      border-radius: 50%;
+      transition: 0.3s;
+    }
+
+    .toggle input:checked + .toggle-slider {
+      background: var(--ui-accent);
+      border-color: var(--ui-accent);
+    }
+
+    .toggle input:checked + .toggle-slider:before {
+      transform: translateX(20px);
+      background: white;
+    }
+
+    /* Preview Styles */
+    .site-preview {
+      min-height: 100%;
+      transition: all 0.3s ease;
+    }
+
+    .site-preview.dark-mode {
+      background: var(--preview-bg-dark);
+      color: var(--preview-text-dark);
+    }
+
+    .site-preview.light-mode {
+      background: var(--preview-bg-light);
+      color: var(--preview-text-light);
+    }
+
+    /* Nav Preview */
+    .preview-nav {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      padding: 16px 40px;
+      border-bottom: 1px solid rgba(128,128,128,0.2);
+    }
+
+    .preview-logo {
+      font-weight: 700;
+      font-size: 20px;
+    }
+
+    .preview-nav-links {
+      display: flex;
+      gap: 32px;
+      font-size: 14px;
+    }
+
+    .preview-nav-links span {
+      opacity: 0.7;
+      cursor: pointer;
+    }
+
+    .preview-nav-links span:hover {
+      opacity: 1;
+    }
+
+    /* Hero Preview */
+    .preview-hero {
+      padding: 80px 40px;
+      text-align: center;
+      position: relative;
+      overflow: hidden;
+    }
+
+    .preview-hero.hero-left {
+      text-align: left;
+      max-width: 800px;
+    }
+
+    .preview-hero.hero-split {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 40px;
+      text-align: left;
+      align-items: center;
+    }
+
+    .preview-hero h1 {
+      font-size: var(--hero-font-size);
+      line-height: 1.1;
+      margin-bottom: 20px;
+      font-weight: 700;
+    }
+
+    .preview-hero .subtitle {
+      font-size: 18px;
+      opacity: 0.8;
+      margin-bottom: 32px;
+      max-width: 600px;
+    }
+
+    .preview-hero.hero-center .subtitle {
+      margin-left: auto;
+      margin-right: auto;
+    }
+
+    .preview-cta {
+      display: inline-block;
+      padding: 14px 32px;
+      background: var(--accent-color);
+      color: white;
+      border-radius: var(--border-radius);
+      font-weight: 600;
+      font-size: 15px;
+      text-decoration: none;
+      transition: all 0.2s;
+    }
+
+    .preview-cta:hover {
+      transform: translateY(-2px);
+      box-shadow: 0 4px 12px rgba(0,0,0,0.2);
+    }
+
+    .hero-visual {
+      background: linear-gradient(135deg, var(--accent-color) 0%, rgba(0,0,0,0.3) 100%);
+      border-radius: 12px;
+      height: 300px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      color: white;
+      font-size: 14px;
+      opacity: 0.8;
+    }
+
+    /* Problems Section */
+    .preview-problems {
+      padding: 60px 40px;
+      background: rgba(128,128,128,0.05);
+    }
+
+    .preview-problems h2 {
+      font-size: 28px;
+      margin-bottom: 40px;
+      text-align: center;
+    }
+
+    .problems-grid {
+      display: grid;
+      grid-template-columns: repeat(2, 1fr);
+      gap: 24px;
+      max-width: 900px;
+      margin: 0 auto;
+    }
+
+    .problem-card {
+      padding: 24px;
+      background: rgba(128,128,128,0.08);
+      border-radius: var(--border-radius);
+      border-left: 3px solid var(--accent-color);
+    }
+
+    .problem-card p {
+      font-size: 15px;
+      font-style: italic;
+      opacity: 0.9;
+    }
+
+    /* Services Section */
+    .preview-services {
+      padding: 60px 40px;
+    }
+
+    .preview-services h2 {
+      font-size: 28px;
+      margin-bottom: 40px;
+      text-align: center;
+    }
+
+    .services-grid {
+      display: grid;
+      gap: 24px;
+      max-width: 1000px;
+      margin: 0 auto;
+    }
+
+    .services-grid.grid-3 {
+      grid-template-columns: repeat(3, 1fr);
+    }
+
+    .services-grid.grid-2 {
+      grid-template-columns: repeat(2, 1fr);
+    }
+
+    .services-grid.grid-list {
+      grid-template-columns: 1fr;
+      max-width: 700px;
+    }
+
+    .service-card {
+      padding: 28px;
+      background: rgba(128,128,128,0.05);
+      border-radius: var(--border-radius);
+      border: 1px solid rgba(128,128,128,0.1);
+      transition: all 0.2s;
+    }
+
+    .service-card:hover {
+      transform: translateY(-4px);
+      box-shadow: 0 8px 24px rgba(0,0,0,0.1);
+    }
+
+    .service-card.card-minimal {
+      border: none;
+      background: transparent;
+      padding: 20px 0;
+      border-bottom: 1px solid rgba(128,128,128,0.1);
+    }
+
+    .service-card.card-bordered {
+      border: 2px solid var(--accent-color);
+      background: transparent;
+    }
+
+    .service-card h3 {
+      font-size: 18px;
+      margin-bottom: 8px;
+    }
+
+    .service-price {
+      color: var(--accent-color);
+      font-weight: 600;
+      font-size: 15px;
+      margin-bottom: 12px;
+    }
+
+    .service-card p {
+      font-size: 14px;
+      opacity: 0.8;
+      line-height: 1.5;
+    }
+
+    /* Animation Preview Indicators */
+    .anim-indicator {
+      position: absolute;
+      top: 10px;
+      right: 10px;
+      background: var(--accent-color);
+      color: white;
+      padding: 4px 8px;
+      border-radius: 4px;
+      font-size: 10px;
+      text-transform: uppercase;
+    }
+
+    .preview-hero.animate-fade h1 {
+      animation: fadeInUp 0.8s ease-out;
+    }
+
+    .preview-hero.animate-split h1 span {
+      display: inline-block;
+      animation: splitIn 0.6s ease-out backwards;
+    }
+
+    .preview-hero.animate-split h1 span:nth-child(2) { animation-delay: 0.1s; }
+    .preview-hero.animate-split h1 span:nth-child(3) { animation-delay: 0.2s; }
+    .preview-hero.animate-split h1 span:nth-child(4) { animation-delay: 0.3s; }
+
+    @keyframes fadeInUp {
+      from { opacity: 0; transform: translateY(30px); }
+      to { opacity: 1; transform: translateY(0); }
+    }
+
+    @keyframes splitIn {
+      from { opacity: 0; transform: translateY(20px) rotateX(-20deg); }
+      to { opacity: 1; transform: translateY(0) rotateX(0); }
+    }
+
+    /* Scrollbar */
+    ::-webkit-scrollbar {
+      width: 8px;
+      height: 8px;
+    }
+
+    ::-webkit-scrollbar-track {
+      background: var(--ui-bg);
+    }
+
+    ::-webkit-scrollbar-thumb {
+      background: var(--ui-border);
+      border-radius: 4px;
+    }
+
+    ::-webkit-scrollbar-thumb:hover {
+      background: var(--ui-muted);
+    }
+
+    .title {
+      font-size: 18px;
+      font-weight: 700;
+      margin-bottom: 4px;
+      color: var(--ui-text);
+    }
+
+    .subtitle-ui {
+      font-size: 12px;
+      color: var(--ui-muted);
+      margin-bottom: 20px;
+    }
+  </style>
+</head>
+<body>
+  <div class="controls">
+    <div class="title">JesseProjects.com</div>
+    <div class="subtitle-ui">Design System Playground</div>
+
+    <div class="presets">
+      <button class="preset-btn active" onclick="applyPreset('professional')">Professional</button>
+      <button class="preset-btn" onclick="applyPreset('bold')">Bold</button>
+      <button class="preset-btn" onclick="applyPreset('minimal')">Minimal</button>
+      <button class="preset-btn" onclick="applyPreset('construction')">Construction</button>
+    </div>
+
+    <div class="control-group">
+      <h3>Theme</h3>
+      <div class="toggle-row">
+        <label>Dark Mode</label>
+        <label class="toggle">
+          <input type="checkbox" id="darkMode" onchange="updateAll()">
+          <span class="toggle-slider"></span>
+        </label>
+      </div>
+      <div class="control">
+        <label>Primary Background</label>
+        <input type="color" id="bgColor" value="#001330" onchange="updateAll()">
+      </div>
+      <div class="control">
+        <label>Accent Color</label>
+        <input type="color" id="accentColor" value="#e74c3c" onchange="updateAll()">
+      </div>
+    </div>
+
+    <div class="control-group">
+      <h3>Hero Layout</h3>
+      <div class="control">
+        <label>Layout Style</label>
+        <select id="heroLayout" onchange="updateAll()">
+          <option value="center">Centered</option>
+          <option value="left">Left-Aligned</option>
+          <option value="split">Split (Text + Visual)</option>
+        </select>
+      </div>
+      <div class="control">
+        <label>Headline Size</label>
+        <input type="range" id="heroSize" min="36" max="72" value="48" onchange="updateAll()">
+        <div class="value-display" id="heroSizeValue">48px</div>
+      </div>
+      <div class="control">
+        <label>Headline</label>
+        <textarea id="headline" onchange="updateAll()">Construction companies lose thousands to bad ERP data. I fix that.</textarea>
+      </div>
+    </div>
+
+    <div class="control-group">
+      <h3>Services Layout</h3>
+      <div class="control">
+        <label>Grid Style</label>
+        <select id="servicesGrid" onchange="updateAll()">
+          <option value="grid-3">3 Columns</option>
+          <option value="grid-2">2 Columns</option>
+          <option value="grid-list">List View</option>
+        </select>
+      </div>
+      <div class="control">
+        <label>Card Style</label>
+        <select id="cardStyle" onchange="updateAll()">
+          <option value="card-filled">Filled</option>
+          <option value="card-bordered">Bordered</option>
+          <option value="card-minimal">Minimal</option>
+        </select>
+      </div>
+    </div>
+
+    <div class="control-group">
+      <h3>Typography</h3>
+      <div class="control">
+        <label>Heading Font</label>
+        <select id="headingFont" onchange="updateAll()">
+          <option value="system-ui, sans-serif">System (Clean)</option>
+          <option value="Georgia, serif">Georgia (Classic)</option>
+          <option value="'Segoe UI', sans-serif">Segoe UI (Microsoft)</option>
+        </select>
+      </div>
+      <div class="control">
+        <label>Border Radius</label>
+        <input type="range" id="borderRadius" min="0" max="24" value="8" onchange="updateAll()">
+        <div class="value-display" id="borderRadiusValue">8px</div>
+      </div>
+    </div>
+
+    <div class="control-group">
+      <h3>Animations</h3>
+      <div class="control">
+        <label>Hero Animation</label>
+        <select id="heroAnim" onchange="updateAll()">
+          <option value="none">None</option>
+          <option value="fade">Fade In Up</option>
+          <option value="split">Text Split (Splitting.js)</option>
+        </select>
+      </div>
+      <div class="toggle-row">
+        <label>Scroll Reveals</label>
+        <label class="toggle">
+          <input type="checkbox" id="scrollReveal" checked onchange="updateAll()">
+          <span class="toggle-slider"></span>
+        </label>
+      </div>
+    </div>
+
+    <div class="control-group">
+      <h3>CTA Button</h3>
+      <div class="control">
+        <label>Button Text</label>
+        <select id="ctaText" onchange="updateAll()">
+          <option value="Let's Talk About Your Data">Let's Talk About Your Data</option>
+          <option value="Schedule a Free Consultation">Schedule a Free Consultation</option>
+          <option value="Get Your First Report">Get Your First Report</option>
+          <option value="Book a Call">Book a Call</option>
+        </select>
+      </div>
+    </div>
+  </div>
+
+  <div class="preview-container">
+    <div class="preview">
+      <div id="site-preview" class="site-preview light-mode">
+        <!-- Preview content rendered by JS -->
+      </div>
+    </div>
+
+    <div class="prompt-output">
+      <div class="prompt-header">
+        <h4>Implementation Prompt</h4>
+        <button class="copy-btn" onclick="copyPrompt()">Copy</button>
+      </div>
+      <div id="prompt-text"></div>
+    </div>
+  </div>
+
+  <script>
+    const DEFAULTS = {
+      darkMode: false,
+      bgColor: '#001330',
+      accentColor: '#e74c3c',
+      heroLayout: 'center',
+      heroSize: 48,
+      headline: 'Construction companies lose thousands to bad ERP data. I fix that.',
+      servicesGrid: 'grid-3',
+      cardStyle: 'card-filled',
+      headingFont: 'system-ui, sans-serif',
+      borderRadius: 8,
+      heroAnim: 'none',
+      scrollReveal: true,
+      ctaText: "Let's Talk About Your Data"
+    };
+
+    const PRESETS = {
+      professional: {
+        darkMode: false,
+        bgColor: '#001330',
+        accentColor: '#e74c3c',
+        heroLayout: 'center',
+        heroSize: 48,
+        servicesGrid: 'grid-3',
+        cardStyle: 'card-filled',
+        headingFont: 'system-ui, sans-serif',
+        borderRadius: 8,
+        heroAnim: 'fade',
+        scrollReveal: true
+      },
+      bold: {
+        darkMode: true,
+        bgColor: '#0a0a0a',
+        accentColor: '#ff6b35',
+        heroLayout: 'left',
+        heroSize: 64,
+        servicesGrid: 'grid-2',
+        cardStyle: 'card-bordered',
+        headingFont: 'system-ui, sans-serif',
+        borderRadius: 4,
+        heroAnim: 'split',
+        scrollReveal: true
+      },
+      minimal: {
+        darkMode: false,
+        bgColor: '#ffffff',
+        accentColor: '#2563eb',
+        heroLayout: 'center',
+        heroSize: 42,
+        servicesGrid: 'grid-list',
+        cardStyle: 'card-minimal',
+        headingFont: 'Georgia, serif',
+        borderRadius: 0,
+        heroAnim: 'none',
+        scrollReveal: false
+      },
+      construction: {
+        darkMode: true,
+        bgColor: '#1a1a2e',
+        accentColor: '#f59e0b',
+        heroLayout: 'split',
+        heroSize: 52,
+        servicesGrid: 'grid-3',
+        cardStyle: 'card-filled',
+        headingFont: 'system-ui, sans-serif',
+        borderRadius: 12,
+        heroAnim: 'fade',
+        scrollReveal: true
+      }
+    };
+
+    let state = { ...DEFAULTS };
+
+    function getState() {
+      return {
+        darkMode: document.getElementById('darkMode').checked,
+        bgColor: document.getElementById('bgColor').value,
+        accentColor: document.getElementById('accentColor').value,
+        heroLayout: document.getElementById('heroLayout').value,
+        heroSize: parseInt(document.getElementById('heroSize').value),
+        headline: document.getElementById('headline').value,
+        servicesGrid: document.getElementById('servicesGrid').value,
+        cardStyle: document.getElementById('cardStyle').value,
+        headingFont: document.getElementById('headingFont').value,
+        borderRadius: parseInt(document.getElementById('borderRadius').value),
+        heroAnim: document.getElementById('heroAnim').value,
+        scrollReveal: document.getElementById('scrollReveal').checked,
+        ctaText: document.getElementById('ctaText').value
+      };
+    }
+
+    function applyPreset(presetName) {
+      const preset = PRESETS[presetName];
+      if (!preset) return;
+
+      document.getElementById('darkMode').checked = preset.darkMode;
+      document.getElementById('bgColor').value = preset.bgColor;
+      document.getElementById('accentColor').value = preset.accentColor;
+      document.getElementById('heroLayout').value = preset.heroLayout;
+      document.getElementById('heroSize').value = preset.heroSize;
+      document.getElementById('servicesGrid').value = preset.servicesGrid;
+      document.getElementById('cardStyle').value = preset.cardStyle;
+      document.getElementById('headingFont').value = preset.headingFont;
+      document.getElementById('borderRadius').value = preset.borderRadius;
+      document.getElementById('heroAnim').value = preset.heroAnim;
+      document.getElementById('scrollReveal').checked = preset.scrollReveal;
+
+      document.querySelectorAll('.preset-btn').forEach(btn => btn.classList.remove('active'));
+      event.target.classList.add('active');
+
+      updateAll();
+    }
+
+    function renderPreview() {
+      state = getState();
+      const preview = document.getElementById('site-preview');
+
+      // Update value displays
+      document.getElementById('heroSizeValue').textContent = state.heroSize + 'px';
+      document.getElementById('borderRadiusValue').textContent = state.borderRadius + 'px';
+
+      // Set CSS variables
+      const lightBg = state.darkMode ? state.bgColor : '#ffffff';
+      const darkBg = state.darkMode ? state.bgColor : '#f5f5f0';
+      const textColor = state.darkMode ? '#e8e8e8' : '#1a1a2e';
+
+      preview.style.setProperty('--preview-bg-light', '#ffffff');
+      preview.style.setProperty('--preview-bg-dark', state.bgColor);
+      preview.style.setProperty('--preview-text-light', '#1a1a2e');
+      preview.style.setProperty('--preview-text-dark', '#e8e8e8');
+      preview.style.setProperty('--accent-color', state.accentColor);
+      preview.style.setProperty('--hero-font-size', state.heroSize + 'px');
+      preview.style.setProperty('--border-radius', state.borderRadius + 'px');
+      preview.style.fontFamily = state.headingFont;
+
+      preview.className = 'site-preview ' + (state.darkMode ? 'dark-mode' : 'light-mode');
+      preview.style.background = state.darkMode ? state.bgColor : '#ffffff';
+      preview.style.color = state.darkMode ? '#e8e8e8' : '#1a1a2e';
+
+      // Build hero based on layout
+      let heroContent = '';
+      const animClass = state.heroAnim === 'fade' ? 'animate-fade' : state.heroAnim === 'split' ? 'animate-split' : '';
+      const headlineHtml = state.heroAnim === 'split'
+        ? state.headline.split(' ').map(w => `<span>${w} </span>`).join('')
+        : state.headline;
+
+      if (state.heroLayout === 'split') {
+        heroContent = `
+          <div>
+            <h1>${headlineHtml}</h1>
+            <p class="subtitle">Custom reports, integrations, and dashboards that give you exact numbers—not "close enough."</p>
+            <a href="#" class="preview-cta">${state.ctaText}</a>
+          </div>
+          <div class="hero-visual">Data Visualization / Photo</div>
+        `;
+      } else {
+        heroContent = `
+          <h1>${headlineHtml}</h1>
+          <p class="subtitle">Custom reports, integrations, and dashboards that give you exact numbers—not "close enough."</p>
+          <a href="#" class="preview-cta">${state.ctaText}</a>
+        `;
+      }
+
+      preview.innerHTML = `
+        <nav class="preview-nav">
+          <div class="preview-logo">JesseProjects</div>
+          <div class="preview-nav-links">
+            <span>Services</span>
+            <span>About</span>
+            <span>Contact</span>
+          </div>
+        </nav>
+
+        <section class="preview-hero hero-${state.heroLayout} ${animClass}">
+          ${state.heroAnim !== 'none' ? `<span class="anim-indicator">${state.heroAnim === 'split' ? 'Splitting.js' : 'Fade'}</span>` : ''}
+          ${heroContent}
+        </section>
+
+        <section class="preview-problems">
+          <h2>Sound Familiar?</h2>
+          <div class="problems-grid">
+            <div class="problem-card">
+              <p>"I can't get the report I need from our ERP"</p>
+            </div>
+            <div class="problem-card">
+              <p>"Our systems don't talk to each other"</p>
+            </div>
+            <div class="problem-card">
+              <p>"The data doesn't match reality"</p>
+            </div>
+            <div class="problem-card">
+              <p>"We're entering the same data 3 times"</p>
+            </div>
+          </div>
+        </section>
+
+        <section class="preview-services">
+          <h2>How I Can Help</h2>
+          <div class="services-grid ${state.servicesGrid}">
+            <div class="service-card ${state.cardStyle}">
+              <h3>Custom Reports</h3>
+              <div class="service-price">$2,000 - $5,000</div>
+              <p>SQL queries that produce the exact data you need. 1-2 week delivery.</p>
+            </div>
+            <div class="service-card ${state.cardStyle}">
+              <h3>Dashboard Packages</h3>
+              <div class="service-price">$8,000 - $15,000</div>
+              <p>5-10 connected reports with executive visibility. 4-6 weeks.</p>
+            </div>
+            <div class="service-card ${state.cardStyle}">
+              <h3>Data Integrations</h3>
+              <div class="service-price">$10,000 - $25,000</div>
+              <p>Connect your ERP to other systems. Automated sync. 6-8 weeks.</p>
+            </div>
+          </div>
+        </section>
+      `;
+    }
+
+    function updatePrompt() {
+      state = getState();
+      const parts = [];
+
+      // Theme
+      if (state.darkMode) {
+        parts.push(`dark mode with ${state.bgColor} background`);
+      }
+      if (state.accentColor !== DEFAULTS.accentColor) {
+        parts.push(`accent color ${state.accentColor}`);
+      }
+
+      // Hero
+      if (state.heroLayout !== DEFAULTS.heroLayout) {
+        const layoutNames = { center: 'centered', left: 'left-aligned', split: 'split layout with text and visual' };
+        parts.push(`${layoutNames[state.heroLayout]} hero`);
+      }
+      if (state.heroSize !== DEFAULTS.heroSize) {
+        parts.push(`${state.heroSize}px headline`);
+      }
+
+      // Services
+      if (state.servicesGrid !== DEFAULTS.servicesGrid) {
+        const gridNames = { 'grid-3': '3-column', 'grid-2': '2-column', 'grid-list': 'list-style' };
+        parts.push(`${gridNames[state.servicesGrid]} service cards`);
+      }
+      if (state.cardStyle !== DEFAULTS.cardStyle) {
+        const styleNames = { 'card-filled': 'filled', 'card-bordered': 'accent-bordered', 'card-minimal': 'minimal/underlined' };
+        parts.push(`${styleNames[state.cardStyle]} card style`);
+      }
+
+      // Typography
+      if (state.headingFont !== DEFAULTS.headingFont) {
+        const fontNames = { 'Georgia, serif': 'Georgia serif', "'Segoe UI', sans-serif": 'Segoe UI' };
+        parts.push(`${fontNames[state.headingFont] || 'custom'} headings`);
+      }
+      if (state.borderRadius !== DEFAULTS.borderRadius) {
+        parts.push(`${state.borderRadius}px border radius`);
+      }
+
+      // Animations
+      if (state.heroAnim !== 'none') {
+        const animNames = { fade: 'fade-in-up entrance animation', split: 'Splitting.js character animation' };
+        parts.push(animNames[state.heroAnim]);
+      }
+      if (state.scrollReveal) {
+        parts.push('ScrollMagic scroll-triggered reveals');
+      }
+
+      // CTA
+      if (state.ctaText !== DEFAULTS.ctaText) {
+        parts.push(`CTA button: "${state.ctaText}"`);
+      }
+
+      let prompt = '';
+      if (parts.length === 0) {
+        prompt = `Build the JesseProjects.com consulting site with the default professional design: centered hero, 3-column service cards, system fonts, and coral accent color. Use React + Vite with Tailwind CSS. Include dark mode toggle that respects system preference.`;
+      } else {
+        prompt = `Build the JesseProjects.com consulting site with: ${parts.join(', ')}.
+
+Use React + Vite with Tailwind CSS. The site should lead with the consulting value prop ("${state.headline.substring(0, 50)}..."), show the 4 common problems, and display services with pricing. Include dark mode toggle${state.darkMode ? ' defaulting to dark' : ''}.`;
+      }
+
+      document.getElementById('prompt-text').textContent = prompt;
+    }
+
+    function updateAll() {
+      renderPreview();
+      updatePrompt();
+    }
+
+    function copyPrompt() {
+      const text = document.getElementById('prompt-text').textContent;
+      navigator.clipboard.writeText(text).then(() => {
+        const btn = document.querySelector('.copy-btn');
+        btn.textContent = 'Copied!';
+        btn.classList.add('copied');
+        setTimeout(() => {
+          btn.textContent = 'Copy';
+          btn.classList.remove('copied');
+        }, 2000);
+      });
+    }
+
+    // Initialize
+    updateAll();
+  </script>
+</body>
+</html>
