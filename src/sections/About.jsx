@@ -1,4 +1,5 @@
-import { motion } from 'framer-motion'
+import { useState } from 'react'
+import { motion, AnimatePresence } from 'framer-motion'
 
 const philosophyQuotes = [
   "Solution statements end discussion. Problem statements start it.",
@@ -6,6 +7,110 @@ const philosophyQuotes = [
   "Real systems beat perfect diagrams.",
   "If the field won't use it, it's broken.",
 ]
+
+// Contact form endpoint - N8N webhook on VPS
+// To configure: create an N8N webhook workflow and update this URL
+const CONTACT_API = '/api/contact'
+
+function ContactForm() {
+  const [formData, setFormData] = useState({ name: '', email: '', subject: '', message: '' })
+  const [status, setStatus] = useState('idle') // idle | sending | success | error
+  const [errorMsg, setErrorMsg] = useState('')
+
+  const handleChange = (e) => {
+    setFormData(prev => ({ ...prev, [e.target.name]: e.target.value }))
+  }
+
+  const handleSubmit = async (e) => {
+    e.preventDefault()
+    setStatus('sending')
+    setErrorMsg('')
+
+    try {
+      const response = await fetch(CONTACT_API, {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({
+          ...formData,
+          source: 'jesseprojects.com',
+          timestamp: new Date().toISOString(),
+        }),
+      })
+
+      if (!response.ok) throw new Error(`Server error: ${response.status}`)
+
+      setStatus('success')
+      setFormData({ name: '', email: '', subject: '', message: '' })
+      setTimeout(() => setStatus('idle'), 5000)
+    } catch (err) {
+      setStatus('error')
+      setErrorMsg('Something went wrong. Try emailing jesse@jesseprojects.com directly.')
+      setTimeout(() => setStatus('idle'), 5000)
+    }
+  }
+
+  const inputClass = "w-full px-4 py-2 rounded-lg border border-gray-300 dark:border-gray-600 bg-white dark:bg-acqua-navy-light text-acqua-navy dark:text-acqua-cream focus:ring-2 focus:ring-acqua-teal focus:border-transparent transition-colors"
+
+  return (
+    <motion.form
+      initial={{ opacity: 0, y: 20 }}
+      whileInView={{ opacity: 1, y: 0 }}
+      viewport={{ once: true }}
+      className="space-y-4"
+      onSubmit={handleSubmit}
+    >
+      <div className="grid sm:grid-cols-2 gap-4">
+        <div>
+          <label htmlFor="name" className="block text-sm font-medium text-acqua-navy dark:text-acqua-cream mb-1">
+            Name *
+          </label>
+          <input type="text" id="name" name="name" required value={formData.name} onChange={handleChange} disabled={status === 'sending'} className={inputClass} />
+        </div>
+        <div>
+          <label htmlFor="email" className="block text-sm font-medium text-acqua-navy dark:text-acqua-cream mb-1">
+            Email *
+          </label>
+          <input type="email" id="email" name="email" required value={formData.email} onChange={handleChange} disabled={status === 'sending'} className={inputClass} />
+        </div>
+      </div>
+      <div>
+        <label htmlFor="subject" className="block text-sm font-medium text-acqua-navy dark:text-acqua-cream mb-1">
+          Subject
+        </label>
+        <input type="text" id="subject" name="subject" value={formData.subject} onChange={handleChange} disabled={status === 'sending'} className={inputClass} />
+      </div>
+      <div>
+        <label htmlFor="message" className="block text-sm font-medium text-acqua-navy dark:text-acqua-cream mb-1">
+          Message *
+        </label>
+        <textarea id="message" name="message" rows={5} required value={formData.message} onChange={handleChange} disabled={status === 'sending'} className={`${inputClass} resize-none`} />
+      </div>
+
+      <div className="flex items-center gap-4">
+        <button
+          type="submit"
+          disabled={status === 'sending'}
+          className="btn-primary w-full sm:w-auto disabled:opacity-50 disabled:cursor-not-allowed"
+        >
+          {status === 'sending' ? 'Sending...' : 'Send Message'}
+        </button>
+
+        <AnimatePresence>
+          {status === 'success' && (
+            <motion.span initial={{ opacity: 0, x: -10 }} animate={{ opacity: 1, x: 0 }} exit={{ opacity: 0 }} className="text-sm text-green-600 dark:text-green-400 font-medium">
+              Sent! I'll get back to you soon.
+            </motion.span>
+          )}
+          {status === 'error' && (
+            <motion.span initial={{ opacity: 0, x: -10 }} animate={{ opacity: 1, x: 0 }} exit={{ opacity: 0 }} className="text-sm text-red-600 dark:text-red-400">
+              {errorMsg}
+            </motion.span>
+          )}
+        </AnimatePresence>
+      </div>
+    </motion.form>
+  )
+}
 
 function AboutSection() {
   return (
@@ -22,7 +127,7 @@ function AboutSection() {
             {/* Profile Image Placeholder */}
             <div className="md:col-span-1">
               <div className="aspect-square rounded-2xl bg-gradient-to-br from-acqua-teal to-acqua-navy overflow-hidden">
-                {/* Profile image would go here */}
+                {/* TODO: Add profile image - place in public/images/about-profile.jpg */}
               </div>
             </div>
 
@@ -97,7 +202,7 @@ function AboutSection() {
             initial={{ opacity: 0 }}
             whileInView={{ opacity: 1 }}
             viewport={{ once: true }}
-            className="grid sm:grid-cols-2 gap-4 mb-12"
+            className="grid sm:grid-cols-3 gap-4 mb-12"
           >
             <a
               href="mailto:jesse@jesseprojects.com"
@@ -154,70 +259,7 @@ function AboutSection() {
           </motion.div>
 
           {/* Contact Form */}
-          <motion.form
-            initial={{ opacity: 0, y: 20 }}
-            whileInView={{ opacity: 1, y: 0 }}
-            viewport={{ once: true }}
-            className="space-y-4"
-            onSubmit={(e) => {
-              e.preventDefault()
-              // Form submission would go here
-              alert('Form submission - would integrate with contact API')
-            }}
-          >
-            <div className="grid sm:grid-cols-2 gap-4">
-              <div>
-                <label htmlFor="name" className="block text-sm font-medium text-acqua-navy dark:text-acqua-cream mb-1">
-                  Name *
-                </label>
-                <input
-                  type="text"
-                  id="name"
-                  name="name"
-                  required
-                  className="w-full px-4 py-2 rounded-lg border border-gray-300 dark:border-gray-600 bg-white dark:bg-acqua-navy-light text-acqua-navy dark:text-acqua-cream focus:ring-2 focus:ring-acqua-teal focus:border-transparent"
-                />
-              </div>
-              <div>
-                <label htmlFor="email" className="block text-sm font-medium text-acqua-navy dark:text-acqua-cream mb-1">
-                  Email *
-                </label>
-                <input
-                  type="email"
-                  id="email"
-                  name="email"
-                  required
-                  className="w-full px-4 py-2 rounded-lg border border-gray-300 dark:border-gray-600 bg-white dark:bg-acqua-navy-light text-acqua-navy dark:text-acqua-cream focus:ring-2 focus:ring-acqua-teal focus:border-transparent"
-                />
-              </div>
-            </div>
-            <div>
-              <label htmlFor="subject" className="block text-sm font-medium text-acqua-navy dark:text-acqua-cream mb-1">
-                Subject
-              </label>
-              <input
-                type="text"
-                id="subject"
-                name="subject"
-                className="w-full px-4 py-2 rounded-lg border border-gray-300 dark:border-gray-600 bg-white dark:bg-acqua-navy-light text-acqua-navy dark:text-acqua-cream focus:ring-2 focus:ring-acqua-teal focus:border-transparent"
-              />
-            </div>
-            <div>
-              <label htmlFor="message" className="block text-sm font-medium text-acqua-navy dark:text-acqua-cream mb-1">
-                Message *
-              </label>
-              <textarea
-                id="message"
-                name="message"
-                rows={5}
-                required
-                className="w-full px-4 py-2 rounded-lg border border-gray-300 dark:border-gray-600 bg-white dark:bg-acqua-navy-light text-acqua-navy dark:text-acqua-cream focus:ring-2 focus:ring-acqua-teal focus:border-transparent resize-none"
-              />
-            </div>
-            <button type="submit" className="btn-primary w-full sm:w-auto">
-              Send Message
-            </button>
-          </motion.form>
+          <ContactForm />
         </div>
       </section>
     </div>

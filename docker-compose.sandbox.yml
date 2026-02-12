@@ -1,0 +1,23 @@
+services:
+  jesseprojects-sandbox:
+    build:
+      context: .
+      dockerfile: Dockerfile.sandbox
+    container_name: jesseprojects-sandbox
+    restart: unless-stopped
+    volumes:
+      # Mount iterations directory to persist builds
+      - ./iterations:/usr/share/nginx/html/iterations
+    labels:
+      - "traefik.enable=true"
+      # Sandbox router for sb.jesseprojects.com
+      - "traefik.http.routers.jesseprojects-sandbox.rule=Host(`sb.jesseprojects.com`)"
+      - "traefik.http.routers.jesseprojects-sandbox.entrypoints=websecure"
+      - "traefik.http.routers.jesseprojects-sandbox.tls.certresolver=mytlschallenge"
+      - "traefik.http.services.jesseprojects-sandbox.loadbalancer.server.port=80"
+    networks:
+      - traefik-public
+
+networks:
+  traefik-public:
+    external: true

@@ -1,0 +1,25 @@
+services:
+  jesseprojects:
+    build:
+      context: .
+      dockerfile: Dockerfile
+    container_name: jesseprojects-prod
+    restart: unless-stopped
+    labels:
+      - "traefik.enable=true"
+      # Main router for jesseprojects.com and www
+      - "traefik.http.routers.jesseprojects-prod.rule=Host(`jesseprojects.com`) || Host(`www.jesseprojects.com`)"
+      - "traefik.http.routers.jesseprojects-prod.entrypoints=websecure"
+      - "traefik.http.routers.jesseprojects-prod.tls.certresolver=mytlschallenge"
+      - "traefik.http.services.jesseprojects-prod.loadbalancer.server.port=80"
+      # Redirect www to non-www
+      - "traefik.http.middlewares.jesseprojects-redirect.redirectregex.regex=^https://www\\.jesseprojects\\.com/(.*)"
+      - "traefik.http.middlewares.jesseprojects-redirect.redirectregex.replacement=https://jesseprojects.com/$${1}"
+      - "traefik.http.middlewares.jesseprojects-redirect.redirectregex.permanent=true"
+      - "traefik.http.routers.jesseprojects-prod.middlewares=jesseprojects-redirect"
+    networks:
+      - traefik-public
+
+networks:
+  traefik-public:
+    external: true
